@@ -21,6 +21,12 @@ uses
   { Delphi }
   System.SysUtils;
 
+{$IFDEF WIN32}
+  {$HPPEMIT '#pragma comment(lib, "Skia.Package.RTL.lib")'}
+{$ELSEIF defined(WIN64)}
+  {$HPPEMIT '#pragma comment(lib, "Skia.Package.RTL.a")'}
+{$ENDIF}
+
 type
   ESkBindings = class(Exception);
 

@@ -33,6 +33,16 @@ uses
   Skia,
   Skia.FMX.Graphics;
 
+{$IFDEF WIN32}
+  (*$HPPEMIT '#pragma comment(lib, "Skia.Package.FMX.lib")'*)
+{$ELSEIF defined(WIN64)}
+  (*$HPPEMIT '#pragma comment(lib, "Skia.Package.FMX.a")'*)
+{$ENDIF}
+(*$HPPEMIT 'namespace Skia {'*)
+(*$HPPEMIT '	namespace Fmx {'*)
+(*$HPPEMIT '		namespace Types { using namespace ::Fmx::Types; }'*)
+(*$HPPEMIT '	}'*)
+(*$HPPEMIT '}'*)
 
 type
   { IGrGlContext }

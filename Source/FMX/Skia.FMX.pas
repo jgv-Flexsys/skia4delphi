@@ -32,6 +32,21 @@ uses
   Skia,
   Skia.FMX.Graphics;
 
+{$IFDEF WIN32}
+  (*$HPPEMIT '#pragma comment(lib, "Skia.Package.FMX.lib")'*)
+{$ELSEIF defined(WIN64)}
+  (*$HPPEMIT '#pragma comment(lib, "Skia.Package.FMX.a")'*)
+{$ENDIF}
+(*$HPPEMIT 'namespace Skia {'*)
+(*$HPPEMIT '	namespace Fmx {'*)
+(*$HPPEMIT '		namespace Types { using namespace ::Fmx::Types; }'*)
+(*$HPPEMIT '		namespace Graphics { using namespace ::Fmx::Graphics; }'*)
+(*$HPPEMIT '		namespace Controls { using namespace ::Fmx::Controls; }'*)
+(*$HPPEMIT '		namespace Ani { using namespace ::Fmx::Ani; }'*)
+(*$HPPEMIT '		namespace Actnlist { using namespace ::Fmx::Actnlist; }'*)
+(*$HPPEMIT '	}'*)
+(*$HPPEMIT '}'*)
+
 const
   {$IF CompilerVersion < 33}
   SkSupportedPlatformsMask = pidWin32 or pidWin64;

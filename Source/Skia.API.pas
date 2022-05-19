@@ -33,6 +33,15 @@ uses
 
 {$ENDIF}
 
+{$IFDEF WIN32}
+  {$HPPEMIT '#pragma comment(lib, "Skia.Package.RTL.lib")'}
+{$ELSEIF defined(WIN64)}
+  {$HPPEMIT '#pragma comment(lib, "Skia.Package.RTL.a")'}
+{$ENDIF}
+{$IFNDEF MSWINDOWS}
+  {$EXTERNALSYM bool}
+{$ENDIF}
+
 type
   {$REGION 'C types'}
 

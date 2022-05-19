@@ -31,6 +31,19 @@ uses
   { Skia }
   Skia;
 
+{$IFDEF WIN32}
+  (*$HPPEMIT '#pragma comment(lib, "Skia.Package.VCL.lib")'*)
+{$ELSE}
+  (*$HPPEMIT '#pragma comment(lib, "Skia.Package.VCL.a")'*)
+{$ENDIF}
+(*$HPPEMIT 'namespace Skia {'*)
+(*$HPPEMIT '	namespace Vcl {'*)
+(*$HPPEMIT '		namespace Graphics { using namespace ::Vcl::Graphics; }'*)
+(*$HPPEMIT '		namespace Controls { using namespace ::Vcl::Controls; }'*)
+(*$HPPEMIT '		namespace ExtCtrls { using namespace ::Vcl::ExtCtrls; }'*)
+(*$HPPEMIT '	}'*)
+(*$HPPEMIT '}'*)
+
 type
   ESkVcl              = class(Exception);
   ESkBitmapHelper     = class(ESkVcl);

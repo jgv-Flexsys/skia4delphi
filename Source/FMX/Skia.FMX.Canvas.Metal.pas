@@ -37,6 +37,18 @@ uses
   Skia,
   Skia.FMX.Graphics;
 
+(*$HPPEMIT 'namespace Skia {'*)
+(*$HPPEMIT '	namespace Fmx {'*)
+(*$HPPEMIT '	  namespace Platform {'*)
+{$IFDEF IOS}
+  (*$HPPEMIT '		  namespace iOS { using namespace ::Fmx::Platform::iOS; }'*)
+{$ELSE}
+  (*$HPPEMIT '		  namespace Mac { using namespace ::Fmx::Platform::Mac; }'*)
+{$ENDIF}
+(*$HPPEMIT '	  }'*)
+(*$HPPEMIT '	}'*)
+(*$HPPEMIT '}'*)
+
 type
   { TGrCanvasMetal }
 

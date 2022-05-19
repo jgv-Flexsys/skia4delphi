@@ -35,6 +35,19 @@ uses
   { Skia }
   Skia;
 
+{$IFDEF WIN32}
+  (*$HPPEMIT '#pragma comment(lib, "Skia.Package.FMX.lib")'*)
+{$ELSEIF defined(WIN64)}
+  (*$HPPEMIT '#pragma comment(lib, "Skia.Package.FMX.a")'*)
+{$ENDIF}
+(*$HPPEMIT 'namespace Skia {'*)
+(*$HPPEMIT '	namespace Fmx {'*)
+(*$HPPEMIT '		namespace Types { using namespace ::Fmx::Types; }'*)
+(*$HPPEMIT '		namespace Graphics { using namespace ::Fmx::Graphics; }'*)
+(*$HPPEMIT '		namespace Textlayout { using namespace ::Fmx::Textlayout; }'*)
+(*$HPPEMIT '	}'*)
+(*$HPPEMIT '}'*)
+
 type
   ESkCanvas = class(Exception);
 
