@@ -53,6 +53,7 @@ contains
   Skia.Vcl.Designtime.Editor.AnimatedImage in '..\..\Source\VCL\Designtime\Skia.Vcl.Designtime.Editor.AnimatedImage.pas' {SkAnimatedImageEditorForm},
   Skia.Vcl.Designtime.Editor.Svg in '..\..\Source\VCL\Designtime\Skia.Vcl.Designtime.Editor.Svg.pas' {SKSvgEditorForm},
   Skia.Vcl.Designtime in '..\..\Source\VCL\Designtime\Skia.Vcl.Designtime.pas',
-  Skia.Vcl.Designtime.ProjectMenu in '..\..\Source\VCL\Designtime\Skia.Vcl.Designtime.ProjectMenu.pas';
+  Skia.Vcl.Designtime.ProjectMenu in '..\..\Source\VCL\Designtime\Skia.Vcl.Designtime.ProjectMenu.pas',
+  Skia.Vcl.Designtime.ProjectMenu.CBuilder in '..\..\Source\VCL\Designtime\Skia.Vcl.Designtime.ProjectMenu.CBuilder.pas';
 
 end.

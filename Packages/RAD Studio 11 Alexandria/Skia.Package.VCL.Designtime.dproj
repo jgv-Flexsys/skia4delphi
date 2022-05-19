@@ -105,6 +105,7 @@
         </DCCReference>
         <DCCReference Include="..\..\Source\VCL\Designtime\Skia.Vcl.Designtime.pas"/>
         <DCCReference Include="..\..\Source\VCL\Designtime\Skia.Vcl.Designtime.ProjectMenu.pas"/>
+        <DCCReference Include="..\..\Source\VCL\Designtime\Skia.Vcl.Designtime.ProjectMenu.CBuilder.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
