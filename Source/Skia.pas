@@ -1547,8 +1547,9 @@ type
 
   { ISkPathIterator }
 
-  ISkPathIterator = interface(ISkEnumerable<TSkPathIteratorElem>)
+  ISkPathIterator = interface(ISkEnumerable)
     ['{5FE88F86-9913-4594-B41D-4A4DA84CB54B}']
+    function GetEnumerator: TSkEnumerator<TSkPathIteratorElem>;
   end;
 
   TSkSegmentMask  = (Line, Quad, Conic, Cubic);
@@ -1939,20 +1940,23 @@ type
 
   { ISkRegionCliperator }
 
-  ISkRegionCliperator = interface(ISkEnumerable<TRect>)
+  ISkRegionCliperator = interface(ISkEnumerable)
     ['{344C7AA5-6D8C-4EC3-AA0E-AAB9C05C2D17}']
+    function GetEnumerator: TSkEnumerator<TRect>;
   end;
 
   { ISkRegionIterator }
 
-  ISkRegionIterator = interface(ISkEnumerable<TRect>)
+  ISkRegionIterator = interface(ISkEnumerable)
     ['{39EC8853-79A8-4428-B924-9945C3777150}']
+    function GetEnumerator: TSkEnumerator<TRect>;
   end;
 
   { ISkRegionSpanerator }
 
-  ISkRegionSpanerator = interface(ISkEnumerable<TPoint>)
+  ISkRegionSpanerator = interface(ISkEnumerable)
     ['{87F952A9-C5AE-4013-A312-046C8F3B19D7}']
+    function GetEnumerator: TSkEnumerator<TPoint>;
   end;
 
   TSkRegionOp = (Difference, Intersect, Union, &Xor, ReverseDifference, Replace);

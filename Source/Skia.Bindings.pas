@@ -128,16 +128,15 @@ type
     property Current: T read GetCurrent;
   end;
 
-  { ISkEnumerable<T> }
+  { ISkEnumerable }
 
-  ISkEnumerable<T> = interface(ISkObject)
+  ISkEnumerable = interface(ISkObject)
     ['{A0D2696B-E080-4F15-8B60-45245B0D0D7B}']
-    function GetEnumerator: TSkEnumerator<T>;
   end;
 
   { TSkEnumerable<T> }
 
-  TSkEnumerable<T> = class abstract(TSkObject, ISkEnumerable<T>)
+  TSkEnumerable<T> = class abstract(TSkObject, ISkEnumerable)
   strict private
     FRun: Boolean;
   protected
