@@ -183,6 +183,7 @@ type
   strict private
     const
       DefaultOptionsSeparator = ';';
+      FinalOutputDirPropertyName = 'FinalOutputDir';
       OutputDirPropertyName = 'OutputDir';
     class function ExpandConfiguration(const ASource: string; const AConfig: IOTABuildConfiguration): string; static;
     class function ExpandEnvironmentVar(var AValue: string): Boolean; static;
@@ -508,7 +509,8 @@ end;
 class function TSkProjectHelper.SupportsSkiaDeployment(
   const AProject: IOTAProject): Boolean;
 begin
-  Result := Assigned(AProject) and AProject.FileName.EndsWith('.dproj', True) and
+  Result := Assigned(AProject) and
+    ((AProject.Personality = sDelphiPersonality) or (AProject.Personality = sCBuilderPersonality)) and
     ((AProject.ApplicationType = sApplication) or (AProject.ApplicationType = sConsole));
 end;
 
@@ -1201,7 +1203,10 @@ begin
 
         if Assigned(ABuildConfig) then
         begin
-          LRelativeOutputPath := LOptions.Values[OutputDirPropertyName];
+          if AProject.Personality = sCBuilderPersonality then
+            LRelativeOutputPath := LOptions.Values[FinalOutputDirPropertyName]
+          else
+            LRelativeOutputPath := LOptions.Values[OutputDirPropertyName];
           AOutputPath := ExpandOutputPath(ExpandPath(AOutputPath, LRelativeOutputPath), ABuildConfig);
           Result := True;
         end
