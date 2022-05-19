@@ -81,8 +81,8 @@ begin
   LSVGDOM := TSkSVGDOM.MakeFromFile(AssetsPath + ASvgFileName);
   if Assigned(LSVGDOM) then
   begin
-    LSVGDOM.Root.Width  := TSkSVGLength.Create(AWidth,  TSkSVGLengthUnit.PX);
-    LSVGDOM.Root.Height := TSkSVGLength.Create(AHeight, TSkSVGLengthUnit.PX);
+    LSVGDOM.Root.Width  := TSkSVGLength.Create(AWidth,  TSkSVGLengthUnit.Pixel);
+    LSVGDOM.Root.Height := TSkSVGLength.Create(AHeight, TSkSVGLengthUnit.Pixel);
 
     LNode := LSVGDOM.FindNodeById(AElementId);
     if Assigned(LNode) then
