@@ -22,7 +22,7 @@ type
   TProjectPlatforms = set of TProjectPlatform;
   TProjectConfig = (pcDebug, pcRelease);
   TProjectConfigs = set of TProjectConfig;
-  TProjectPersonality = (ppCPlusPlusBuilder, ppDelphi);
+  TProjectPersonality = (ppCBuilder, ppDelphi);
   TProjectPersonalities = set of TProjectPersonality;
 
   TRADStudioProject = record
@@ -414,7 +414,7 @@ begin
       if SameText(LXMLNode.Text, 'Delphi.Personality.12') then
         AProject.Personality := ppDelphi
       else if SameText(LXMLNode.Text, 'CPlusPlusBuilder.Personality.12') then
-        AProject.Personality := ppCPlusPlusBuilder
+        AProject.Personality := ppCBuilder
       else
       begin
         TryShowErrorFmt(CustomMessage('RADStudioProjectErrorParsingProjectUnknownPersonality'), [AFileName, LXMLNode.Text]);

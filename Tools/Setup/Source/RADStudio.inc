@@ -26,7 +26,7 @@ type
     RegVersion: string;
     SupportedPlatforms: TProjectPlatforms;
     SupportedPlatformsDelphi: TProjectPlatforms;
-    SupportedPlatformsCPPBuilder: TProjectPlatforms;
+    SupportedPlatformsCBuilder: TProjectPlatforms;
     MaxDprojVersion: string;
     MinDprojVersion: string;
     PackageVersion: string;
@@ -290,7 +290,7 @@ begin
   LRADStudioVersion.RegVersion := '15.0';
   LRADStudioVersion.SupportedPlatforms := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSSimulator, pfOSX32];
   LRADStudioVersion.SupportedPlatformsDelphi := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSSimulator, pfOSX32];
-  LRADStudioVersion.SupportedPlatformsCPPBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfOSX32];
+  LRADStudioVersion.SupportedPlatformsCBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfOSX32];
   LRADStudioVersion.MaxDprojVersion := '16.1';
   LRADStudioVersion.MinDprojVersion := '16.0';
   LRADStudioVersion.PackageVersion := '210';
@@ -307,7 +307,7 @@ begin
   LRADStudioVersion.RegVersion := '16.0';
   LRADStudioVersion.SupportedPlatforms := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32];
   LRADStudioVersion.SupportedPlatformsDelphi := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32];
-  LRADStudioVersion.SupportedPlatformsCPPBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfOSX32];
+  LRADStudioVersion.SupportedPlatformsCBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfOSX32];
   LRADStudioVersion.MaxDprojVersion := '17.2';
   LRADStudioVersion.MinDprojVersion := '17.1';
   LRADStudioVersion.PackageVersion := '220';
@@ -324,7 +324,7 @@ begin
   LRADStudioVersion.RegVersion := '17.0';
   LRADStudioVersion.SupportedPlatforms := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32];
   LRADStudioVersion.SupportedPlatformsDelphi := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32];
-  LRADStudioVersion.SupportedPlatformsCPPBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfOSX32];
+  LRADStudioVersion.SupportedPlatformsCBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfOSX32];
   LRADStudioVersion.MaxDprojVersion := '18.1'; // Conflicted
   LRADStudioVersion.MinDprojVersion := '18.0';
   LRADStudioVersion.PackageVersion := '230';
@@ -341,7 +341,7 @@ begin
   LRADStudioVersion.RegVersion := '18.0';
   LRADStudioVersion.SupportedPlatforms := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32];
   LRADStudioVersion.SupportedPlatformsDelphi := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32];
-  LRADStudioVersion.SupportedPlatformsCPPBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfOSX32];
+  LRADStudioVersion.SupportedPlatformsCBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfOSX32];
   LRADStudioVersion.MaxDprojVersion := '18.2'; // Conflicted
   LRADStudioVersion.MinDprojVersion := '18.1'; // Conflicted
   LRADStudioVersion.PackageVersion := '240';
@@ -358,7 +358,7 @@ begin
   LRADStudioVersion.RegVersion := '19.0';
   LRADStudioVersion.SupportedPlatforms := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32, pfLinux64];
   LRADStudioVersion.SupportedPlatformsDelphi := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32, pfLinux64];
-  LRADStudioVersion.SupportedPlatformsCPPBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfOSX32];
+  LRADStudioVersion.SupportedPlatformsCBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfOSX32];
   LRADStudioVersion.MaxDprojVersion := '18.4';
   LRADStudioVersion.MinDprojVersion := '18.2'; // Conflicted
   LRADStudioVersion.PackageVersion := '250';
@@ -375,7 +375,7 @@ begin
   LRADStudioVersion.RegVersion := '20.0';
   LRADStudioVersion.SupportedPlatforms := [pfWin32, pfWin64, pfAndroid, pfAndroid64, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32, pfOSX64, pfLinux64];
   LRADStudioVersion.SupportedPlatformsDelphi := [pfWin32, pfWin64, pfAndroid, pfAndroid64, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32, pfOSX64, pfLinux64];
-  LRADStudioVersion.SupportedPlatformsCPPBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfOSX32];
+  LRADStudioVersion.SupportedPlatformsCBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfOSX32];
   LRADStudioVersion.MaxDprojVersion := '18.8';
   LRADStudioVersion.MinDprojVersion := '18.5';
   LRADStudioVersion.PackageVersion := '260';
@@ -392,7 +392,7 @@ begin
   LRADStudioVersion.RegVersion := '21.0';
   LRADStudioVersion.SupportedPlatforms := [pfWin32, pfWin64, pfAndroid, pfAndroid64, pfiOSDevice64, pfiOSSimulator, pfOSX64, pfLinux64];
   LRADStudioVersion.SupportedPlatformsDelphi := [pfWin32, pfWin64, pfAndroid, pfAndroid64, pfiOSDevice64, pfiOSSimulator, pfOSX64, pfLinux64];
-  LRADStudioVersion.SupportedPlatformsCPPBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice64];
+  LRADStudioVersion.SupportedPlatformsCBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice64];
   LRADStudioVersion.MaxDprojVersion := '19.2';
   LRADStudioVersion.MinDprojVersion := '19.0';
   LRADStudioVersion.PackageVersion := '270';
@@ -409,7 +409,7 @@ begin
   LRADStudioVersion.RegVersion := '22.0';
   LRADStudioVersion.SupportedPlatforms := [pfWin32, pfWin64, pfAndroid, pfAndroid64, pfiOSDevice64, pfiOSSimulator, pfOSX64, pfOSXARM64, pfLinux64];
   LRADStudioVersion.SupportedPlatformsDelphi := [pfWin32, pfWin64, pfAndroid, pfAndroid64, pfiOSDevice64, pfiOSSimulator, pfOSX64, pfOSXARM64, pfLinux64];
-  LRADStudioVersion.SupportedPlatformsCPPBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice64];
+  LRADStudioVersion.SupportedPlatformsCBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice64];
   LRADStudioVersion.MaxDprojVersion := '19.4';
   LRADStudioVersion.MinDprojVersion := '19.3';
   LRADStudioVersion.PackageVersion := '280';
