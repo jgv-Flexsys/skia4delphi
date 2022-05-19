@@ -22,10 +22,10 @@
     <projectSourceUrl>https://github.com/skia4delphi/skia4delphi</projectSourceUrl>
     <docsUrl>https://github.com/skia4delphi/skia4delphi/blob/main/README.md</docsUrl>
     <bugTrackerUrl>https://github.com/skia4delphi/skia4delphi/issues</bugTrackerUrl>
-    <tags>skia delphi firemokey</tags>
+    <tags>skia delphi firemokey c++builder cbuilder</tags>
     <releaseNotes>https://github.com/skia4delphi/skia4delphi/releases</releaseNotes>
-    <summary>Cross-platform 2D graphics lbrary for Delphi based on Google's Skia</summary>
-    <description><![CDATA[Skia4Delphi is a cross-platform 2D graphics API for Delphi based on Google's Skia Graphics Library (skia.org).
+    <summary>Cross-platform 2D graphics library for Delphi and C++Builder based on Google's Skia</summary>
+    <description><![CDATA[Skia4Delphi is a cross-platform 2D graphics API for Delphi and C++Builder based on Google's Skia Graphics Library (skia.org).
 
 Google's Skia Graphics Library serves as the graphics engine for Google Chrome and Chrome OS, Android, Flutter, Xamarin, Mozilla Firefox and Firefox OS, and many other products.
 
@@ -39,7 +39,7 @@ Google's Skia Graphics Library serves as the graphics engine for Google Chrome a
   - `20.0` - RAD Studio 10.3 Rio
   - `21.0` - RAD Studio 10.4 Sydney
   - `22.0` - RAD Studio 11 Alexandria
-  - `all` - All RAD Studio versions detected in sysem (default)
+  - `all` - All RAD Studio versions detected in system (default)
 
   The ".0" can be omitted, so "22" is the same of "22.0".
 

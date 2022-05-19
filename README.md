@@ -11,7 +11,7 @@
 
 #  
 
-**[Skia4Delphi](https://skia4delphi.org)** is a cross-platform 2D graphics API for Delphi based on [Google's Skia](https://skia.org/) graphics library.
+**[Skia4Delphi](https://skia4delphi.org)** is a cross-platform 2D graphics API for Delphi and C++Builder based on [Google's Skia](https://skia.org/) graphics library.
 
 <p><a href="https://www.youtube.com/watch?v=hI8L4qBXTgk&list=PLs0VGibu9RJZ8eQ_oJqfZx2jBwNT5wddU"><img src="Assets/Documents/video-preview.png" width="640" alt="Video Preview" /></a></p>
 
@@ -719,11 +719,12 @@ The example above results in the output below:
 
 | RAD Studio                   | Platforms        |
 |------------------------------|------------------|
-| RAD Studio 11 Alexandria   | All Platforms    |
+| RAD Studio 11 Alexandria     | All Platforms    |
 | RAD Studio 10.3 Rio or newer | Windows, Android |
 | RAD Studio XE7 or newer      | Windows          |
 
 For the platforms supported by **Skia4Delphi** (listed above), the OS versions supported by the library are the same [OS versions that RAD Studio supports.](https://docwiki.embarcadero.com/PlatformStatus/en/Main_Page)
+The **Skia4Delphi** is also compatible with C++Builder
 
 ## Remarks
 
