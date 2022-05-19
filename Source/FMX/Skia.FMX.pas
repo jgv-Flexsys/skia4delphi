@@ -1832,8 +1832,8 @@ procedure TSkSvgBrush.Render(const ACanvas: ISkCanvas; const ADestRect: TRectF;
     begin
       if AWrapMode <> TSkSvgWrapMode.Default then
       begin
-        ADOM.Root.Width  := TSkSVGLength.Create(AWrappedDest.Width,  TSkSVGLengthUnit.PX);
-        ADOM.Root.Height := TSkSVGLength.Create(AWrappedDest.Height, TSkSVGLengthUnit.PX);
+        ADOM.Root.Width  := TSkSVGLength.Create(AWrappedDest.Width,  TSkSVGLengthUnit.Pixel);
+        ADOM.Root.Height := TSkSVGLength.Create(AWrappedDest.Height, TSkSVGLengthUnit.Pixel);
       end;
     end
     else
@@ -1889,8 +1889,8 @@ begin
           begin
             if FWrapMode <> TSkSvgWrapMode.Default then
             begin
-              LDOM.Root.Width  := TSkSVGLength.Create(LWrappedDest.Width,  TSkSVGLengthUnit.PX);
-              LDOM.Root.Height := TSkSVGLength.Create(LWrappedDest.Height, TSkSVGLengthUnit.PX);
+              LDOM.Root.Width  := TSkSVGLength.Create(LWrappedDest.Width,  TSkSVGLengthUnit.Pixel);
+              LDOM.Root.Height := TSkSVGLength.Create(LWrappedDest.Height, TSkSVGLengthUnit.Pixel);
             end;
           end
           else

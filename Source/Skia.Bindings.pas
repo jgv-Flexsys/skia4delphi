@@ -78,7 +78,7 @@ type
   { ISkReferenceCountedBase }
 
   ISkReferenceCountedBase = interface(ISkObject)
-    procedure Release;
+    procedure _Release;
     procedure Retain;
   end;
 
@@ -86,7 +86,7 @@ type
 
   TSkReferenceCountedBase = class abstract(TSkObject)
   strict protected
-    procedure Release;
+    procedure _Release;
     procedure Retain;
   end;
 
@@ -330,7 +330,7 @@ end;
 
 { TSkReferenceCountedBase }
 
-procedure TSkReferenceCountedBase.Release;
+procedure TSkReferenceCountedBase._Release;
 begin
   UnrefHandle(GetHandle);
 end;

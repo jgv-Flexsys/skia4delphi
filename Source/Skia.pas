@@ -2302,26 +2302,26 @@ type
     procedure WriteUniform(const AOffset: NativeUInt; const AData; const ASize: NativeUInt);
     property ChildCount: Integer read GetChildCount;
     property ChildrenBlenders[const AIndex: Integer]: ISkBlender read GetChildBlender write SetChildBlender;
-    property ChildrenBlenders[const AName: string]: ISkBlender read GetChildBlender write SetChildBlender;
+    property ChildrenBlendersByName[const AName: string]: ISkBlender read GetChildBlender write SetChildBlender;
     property ChildrenColorFilters[const AIndex: Integer]: ISkColorFilter read GetChildColorFilter write SetChildColorFilter;
-    property ChildrenColorFilters[const AName: string]: ISkColorFilter read GetChildColorFilter write SetChildColorFilter;
+    property ChildrenColorFiltersByName[const AName: string]: ISkColorFilter read GetChildColorFilter write SetChildColorFilter;
     property ChildrenNames[const AIndex: Integer]: string read GetChildName;
     property ChildrenShaders[const AIndex: Integer]: ISkShader read GetChildShader write SetChildShader;
-    property ChildrenShaders[const AName: string]: ISkShader read GetChildShader write SetChildShader;
+    property ChildrenShadersByName[const AName: string]: ISkShader read GetChildShader write SetChildShader;
     property ChildType[const AIndex: Integer]: TSkRuntimeEffectChildType read GetChildType;
-    property ChildType[const AName: string]: TSkRuntimeEffectChildType read GetChildType;
+    property ChildTypeByName[const AName: string]: TSkRuntimeEffectChildType read GetChildType;
     property UniformCount: Integer read GetUniformCount;
     property UniformData: Pointer read GetUniformData;
     property UniformDataSize: NativeUInt read GetUniformDataSize;
     property UniformNames[const AIndex: Integer]: string read GetUniformName;
     property UniformOffset[const AIndex: Integer]: NativeUInt read GetUniformOffset;
-    property UniformOffset[const AName: string]: NativeUInt read GetUniformOffset;
+    property UniformOffsetByName[const AName: string]: NativeUInt read GetUniformOffset;
     property Uniforms[const AIndex: Integer]: Pointer read GetUniform;
-    property Uniforms[const AName: string]: Pointer read GetUniform;
+    property UniformsByName[const AName: string]: Pointer read GetUniform;
     property UniformType[const AIndex: Integer]: TSkRuntimeEffectUniformType read GetUniformType;
-    property UniformType[const AName: string]: TSkRuntimeEffectUniformType read GetUniformType;
+    property UniformTypeByName[const AName: string]: TSkRuntimeEffectUniformType read GetUniformType;
     property UniformTypeCount[const AIndex: Integer]: Integer read GetUniformTypeCount;
-    property UniformTypeCount[const AName: string]: Integer read GetUniformTypeCount;
+    property UniformTypeCountByName[const AName: string]: Integer read GetUniformTypeCount;
   end;
 
   { TSkRuntimeEffect }
@@ -3408,7 +3408,7 @@ type
     function TrySetAttribute(const AName, AValue: string): Boolean;
   end;
 
-  TSkSVGLengthUnit = (Unknown, Number, Percentage, EMS, EXS, PX, CM, MM, &IN, PT, PC);
+  TSkSVGLengthUnit = (Unknown, Number, Percentage, EMS, EXS, Pixel, Centimeter, Millimeter, Inch, Point, Pica);
 
   { TSkSVGLength }
 
