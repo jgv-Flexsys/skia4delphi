@@ -36,7 +36,7 @@ function _OnGetBuildCustonParam(): string; forward;
 /// <summary> Try to extract pre-build objects binaries when the command line compilation has failed </summary>
 function _OnTryExtractPreBuildObjects(const AInfo: TRADStudioInfo): Boolean; forward;
 /// <summary> Make custom changes before the installation </summary>
-function _OnTryPrepareProjectInstallation(var AProjectItem: TRADStudioGroupProjectItem; const AInfo: TRADStudioInfo): Boolean; forward;  
+function _OnTryPrepareProjectInstallation(var AProjectItem: TRADStudioGroupProjectItem; const AInfo: TRADStudioInfo): Boolean; forward;
 /// <summary> Make custom changes before the uninstallation </summary>
 function _OnTryPrepareProjectUninstallation(var AProjectItem: TRADStudioGroupProjectItem; const AInfo: TRADStudioInfo): Boolean; forward;
 /// <summary> Remove old library search path </summary>
@@ -72,13 +72,13 @@ begin
       Exit;
     end;
   end;
-  Result := (ExtractTemporaryFiles(CombinePath('{app}', AddBackslash('{#LibraryDCUFolder}')) + '*') > 0);  
+  Result := (ExtractTemporaryFiles(CombinePath('{app}', AddBackslash('{#LibraryDCUFolder}')) + '*') > 0);
   if not Result then
   begin
     Log(Format('Skia4Delphi._OnTryExtractPreBuildObjects: Failed to extract the temporary files of "%s"', [CombinePath('{app}', AddBackslash('{#LibraryDCUFolder}'))]));
     Exit;
   end;
-  Result := (GetArrayLength(GetFiles(LExtractedPath, '*', soAllDirectories)) > 0);  
+  Result := (GetArrayLength(GetFiles(LExtractedPath, '*', soAllDirectories)) > 0);
   if not Result then
   begin
     Log(Format('Skia4Delphi._OnTryExtractPreBuildObjects: No pre-build objects found for %s', [AInfo.Version.Name]));
@@ -89,7 +89,7 @@ begin
   begin
     Result := DelTree(LDCUPath, True, True, True);
     if not Result then
-    begin 
+    begin
       Log(Format('Skia4Delphi._OnTryExtractPreBuildObjects: Failed to delete the directory "%s"', [LDCUPath]));
       Exit;
     end;
@@ -118,6 +118,7 @@ begin
   for I := 0 to GetArrayLength(AProjectItem.Project.SourcePaths) - 1 do
     StringChangeEx(AProjectItem.Project.SourcePaths[I], LAppPath, LibraryDirDefine, True);
   StringChangeEx(AProjectItem.Project.DCUOutputPath, LAppPath, LibraryDirDefine, True);
+  StringChangeEx(AProjectItem.Project.HppOutputPath, LAppPath, LibraryDirDefine, True);
   Result := TryAddRADStudioEnvVariable(AInfo.Version, LibraryDirVariable, ExpandConstant('{app}')) and
     TryAddRADStudioPathEnvVariable(AInfo.Version, CombinePath(LAppPath, LibraryWin32BinaryDir));
   if Result then
@@ -136,6 +137,7 @@ begin
   for I := 0 to GetArrayLength(AProjectItem.Project.SourcePaths) - 1 do
     StringChangeEx(AProjectItem.Project.SourcePaths[I], LAppPath, LibraryDirDefine, True);
   StringChangeEx(AProjectItem.Project.DCUOutputPath, LAppPath, LibraryDirDefine, True);
+  StringChangeEx(AProjectItem.Project.HppOutputPath, LAppPath, LibraryDirDefine, True);
   Result := TryRemoveRADStudioEnvVariable(AInfo.Version, LibraryDirVariable);
   Result := TryRemoveRADStudioPathEnvVariable(AInfo.Version, CombinePath(LAppPath, LibraryWin32BinaryDir)) and Result;
   Result := TryRemoveRADStudioLibrarySearchPath(AInfo.Version, pfiOSDevice64, CombinePath(LibraryDirDefine, LibraryiOSDevice64BinaryDir)) and Result;
@@ -149,7 +151,7 @@ procedure _RemoveOldLibrarySearchPath(const AProjectItem: TRADStudioGroupProject
 var
   LOldRADStudioName: string;
   LPlatform: TProjectPlatform;
-begin   
+begin
   Log(Format('Skia4Delphi._RemoveOldLibrarySearchPath: Removing old search path of "%s" project...', [AProjectItem.Project.FileName]));
   if SameText(ExtractFileName(AProjectItem.Project.FileName), 'Skia.Package.RTL.dproj') then
   begin
@@ -164,7 +166,7 @@ begin
       end;
     end;
     if AInfo.Version.RegVersion = '22.0' then
-    begin 
+    begin
       for LPlatform := LowProjectPlatform to HighProjectPlatform do
       begin
         if not (LPlatform in GetPlatformsAllowedToBuild(AInfo)) then
@@ -184,7 +186,7 @@ begin
   FOnTryPrepareProjectInstallation := @_OnTryPrepareProjectInstallation;
   FOnTryPrepareProjectUninstallation := @_OnTryPrepareProjectUninstallation;
   Result := True;
-end; 
+end;
 
 <event('InitializeUninstall')>
 function _Skia4DelphiInitializeUninstall: Boolean;

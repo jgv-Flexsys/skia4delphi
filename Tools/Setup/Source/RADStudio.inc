@@ -24,7 +24,7 @@ type
   TRADStudioVersion = record
     Name: string;
     RegVersion: string;
-    SupportedPlatforms: TProjectPlatforms;          
+    SupportedPlatforms: TProjectPlatforms;
     SupportedPlatformsDelphi: TProjectPlatforms;
     SupportedPlatformsCPPBuilder: TProjectPlatforms;
     MaxDprojVersion: string;
@@ -41,6 +41,7 @@ type
 
   TRADStudioInfo = record
     AppFileName: string;
+    Personalities: TProjectPersonalities;
     RootDir: string;
     Status: TRADStudioInstallationStatus;
     Version: TRADStudioVersion;
@@ -117,7 +118,7 @@ function _SortRADStudioInfos(AInfos: TRADStudioInfos): TRADStudioInfos; forward;
 /// <summary> Try to add a path to the Library registry (in a specific registry name) of the RAD Studio </summary>
 function _TryAddRADStudioLibraryPath(const ARADStudioVersion: TRADStudioVersion; const APlatform: TProjectPlatform; const ARegName, APath: string): Boolean; forward;
 /// <summary> Try to get the RADStudio installations info </summary>
-function _TryGetRADStudioInstallation(const ARADStudioVersion: TRADStudioVersion; const ARootKey: Integer; out AAppFileName, ARootDir: string): Boolean; forward;
+function _TryGetRADStudioInstallation(const ARADStudioVersion: TRADStudioVersion; const ARootKey: Integer; out AAppFileName, ARootDir: string; out APersonalities: TProjectPersonalities): Boolean; forward;
 /// <summary> Try to remove a bpl from the "disabled packages" registry of the RAD Studio </summary>
 function _TryRemoveRADStudioBplFromDisabledPackages(const ARADStudioVersion: TRADStudioVersion; const ABplFileName: string): Boolean; forward;
 /// <summary> Try to remove a path from the Library registry (in a specific registry name) of the RAD Studio </summary>
@@ -189,14 +190,14 @@ var
   LResultCode: Integer;
 begin
   Result.Version := ARADStudioVersion;
-  if _TryGetRADStudioInstallation(ARADStudioVersion, HKEY_CURRENT_USER, Result.AppFileName, Result.RootDir) then
+  if _TryGetRADStudioInstallation(ARADStudioVersion, HKEY_CURRENT_USER, Result.AppFileName, Result.RootDir, Result.Personalities) then
   begin
     if (not Exec(ExpandConstant('{cmd}'), Format('/C "%s" --test > nul 2>&1', [ExtractFilePath(Result.AppFileName) + 'DCC32.EXE']), '', SW_HIDE, ewWaitUntilTerminated, LResultCode)) or (LResultCode = 0) then
       Result.Status := riToolchainNotSupported
     else
       Result.Status := riNormal;
   end
-  else if _TryGetRADStudioInstallation(ARADStudioVersion, HKEY_LOCAL_MACHINE, Result.AppFileName, Result.RootDir) then
+  else if _TryGetRADStudioInstallation(ARADStudioVersion, HKEY_LOCAL_MACHINE, Result.AppFileName, Result.RootDir, Result.Personalities) then
     Result.Status := riNeedOpenFirst
   else
     Result.Status := riNotFound;
@@ -322,8 +323,8 @@ begin
   LRADStudioVersion.Name := 'RAD Studio 10.0 Seattle';
   LRADStudioVersion.RegVersion := '17.0';
   LRADStudioVersion.SupportedPlatforms := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32];
-  LRADStudioVersion.SupportedPlatformsDelphi := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32];       
-  LRADStudioVersion.SupportedPlatformsCPPBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfOSX32];   
+  LRADStudioVersion.SupportedPlatformsDelphi := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32];
+  LRADStudioVersion.SupportedPlatformsCPPBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfOSX32];
   LRADStudioVersion.MaxDprojVersion := '18.1'; // Conflicted
   LRADStudioVersion.MinDprojVersion := '18.0';
   LRADStudioVersion.PackageVersion := '230';
@@ -339,7 +340,7 @@ begin
   LRADStudioVersion.Name := 'RAD Studio 10.1 Berlin';
   LRADStudioVersion.RegVersion := '18.0';
   LRADStudioVersion.SupportedPlatforms := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32];
-  LRADStudioVersion.SupportedPlatformsDelphi := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32];             
+  LRADStudioVersion.SupportedPlatformsDelphi := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32];
   LRADStudioVersion.SupportedPlatformsCPPBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfOSX32];
   LRADStudioVersion.MaxDprojVersion := '18.2'; // Conflicted
   LRADStudioVersion.MinDprojVersion := '18.1'; // Conflicted
@@ -356,7 +357,7 @@ begin
   LRADStudioVersion.Name := 'RAD Studio 10.2 Tokyo';
   LRADStudioVersion.RegVersion := '19.0';
   LRADStudioVersion.SupportedPlatforms := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32, pfLinux64];
-  LRADStudioVersion.SupportedPlatformsDelphi := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32, pfLinux64];        
+  LRADStudioVersion.SupportedPlatformsDelphi := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32, pfLinux64];
   LRADStudioVersion.SupportedPlatformsCPPBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfOSX32];
   LRADStudioVersion.MaxDprojVersion := '18.4';
   LRADStudioVersion.MinDprojVersion := '18.2'; // Conflicted
@@ -373,7 +374,7 @@ begin
   LRADStudioVersion.Name := 'RAD Studio 10.3 Rio';
   LRADStudioVersion.RegVersion := '20.0';
   LRADStudioVersion.SupportedPlatforms := [pfWin32, pfWin64, pfAndroid, pfAndroid64, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32, pfOSX64, pfLinux64];
-  LRADStudioVersion.SupportedPlatformsDelphi := [pfWin32, pfWin64, pfAndroid, pfAndroid64, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32, pfOSX64, pfLinux64];        
+  LRADStudioVersion.SupportedPlatformsDelphi := [pfWin32, pfWin64, pfAndroid, pfAndroid64, pfiOSDevice32, pfiOSDevice64, pfiOSSimulator, pfOSX32, pfOSX64, pfLinux64];
   LRADStudioVersion.SupportedPlatformsCPPBuilder := [pfWin32, pfWin64, pfAndroid, pfiOSDevice32, pfiOSDevice64, pfOSX32];
   LRADStudioVersion.MaxDprojVersion := '18.8';
   LRADStudioVersion.MinDprojVersion := '18.5';
@@ -586,8 +587,11 @@ begin
     Log(Format('RADStudio.TryGetRADStudioVersionByRegVersion: Failed to get the RAD Studio version by the reg version "%s".', [ARegVersion]));
 end;
 
-function _TryGetRADStudioInstallation(const ARADStudioVersion: TRADStudioVersion; const ARootKey: Integer; out AAppFileName, ARootDir: string): Boolean;
+function _TryGetRADStudioInstallation(const ARADStudioVersion: TRADStudioVersion; const ARootKey: Integer; out AAppFileName, ARootDir: string; out APersonalities: TProjectPersonalities): Boolean;
+var
+  LPersonality: string;
 begin
+  APersonalities := [];
   try
     if not RegQueryStringValue(ARootKey, GetRADStudioRegKey(ARADStudioVersion), 'RootDir', ARootDir) then
     begin
@@ -602,6 +606,10 @@ begin
       Exit;
     end;
     ARootDir := RemoveBackslashUnlessRoot(ARootDir);
+    if RegQueryStringValue(ARootKey, GetRADStudioRegKey(ARADStudioVersion) + '\Personalities', 'Delphi.Win32', LPersonality) and (LPersonality <> '') then
+      APersonalities := [ppDelphi];
+    if RegQueryStringValue(ARootKey, GetRADStudioRegKey(ARADStudioVersion) + '\Personalities', 'BCB', LPersonality) and (LPersonality <> '') then
+      APersonalities := APersonalities + [ppCBuilder];
     Result := True;
   finally
     if not Result then

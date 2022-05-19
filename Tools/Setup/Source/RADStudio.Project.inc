@@ -23,6 +23,7 @@ type
   TProjectConfig = (pcDebug, pcRelease);
   TProjectConfigs = set of TProjectConfig;
   TProjectPersonality = (ppCPlusPlusBuilder, ppDelphi);
+  TProjectPersonalities = set of TProjectPersonality;
 
   TRADStudioProject = record
     FileName: string;
@@ -31,12 +32,14 @@ type
     BplOutputPath: string;
     DcpOutputPath: string;
     DCUOutputPath: string;
+    HppOutputPath: string;
     DllSuffix: string;
     Platforms: TProjectPlatforms;
     ProjectVersion: string;
     Personality: TProjectPersonality;
     IsPackage: Boolean;
     IsInstallable: Boolean;
+    GeneratesCBuilderOutput: Boolean;
     RequiresDCPCount: Integer;
   end;
 
@@ -114,10 +117,10 @@ begin
   Result := ExpandConstant(Result);
   if Pos('$(', Result) = 0 then
     Result := ExpandFileName(Result);
-end; 
+end;
 
 procedure _ExpandProjectRootPath(var APath: string; const ADefaultRootPath: string);
-begin 
+begin
   if ExtractFileDrive(APath) = '' then
     APath := CombinePath(ADefaultRootPath, APath);
   APath := ExpandFileName(APath);
@@ -182,7 +185,7 @@ begin
 end;
 
 function GetRADStudioProjectDcpOutputFileName(const AProject: TRADStudioProject): string;
-begin 
+begin
   Result := AddBackslash(AProject.DcpOutputPath) + ExtractFileName(ChangeFileExt(AProject.FileName, '.dcp'));
 end;
 
@@ -193,7 +196,7 @@ var
   LGroupProjectItem: TRADStudioGroupProjectItem;
   LProject: TRADStudioProject;
 begin
-  for I := 0 to GetArrayLength(AGroupProjects) - 1 do 
+  for I := 0 to GetArrayLength(AGroupProjects) - 1 do
   begin
     LGroupProject := AGroupProjects[I];
     StringChangeEx(LGroupProject.FileName, AddBackslash(AOldRootPath), AddBackslash(ANewRootPath), True);
@@ -207,6 +210,7 @@ begin
       StringChangeEx(LProject.BplOutputPath, AddBackslash(AOldRootPath), AddBackslash(ANewRootPath), True);
       StringChangeEx(LProject.DcpOutputPath, AddBackslash(AOldRootPath), AddBackslash(ANewRootPath), True);
       StringChangeEx(LProject.DCUOutputPath, AddBackslash(AOldRootPath), AddBackslash(ANewRootPath), True);
+      StringChangeEx(LProject.HppOutputPath, AddBackslash(AOldRootPath), AddBackslash(ANewRootPath), True);
       LGroupProjectItem.Project := LProject;
       LGroupProject.Items[J] := LGroupProjectItem;
     end;
@@ -223,7 +227,7 @@ var
   LProject: TRADStudioProject;
   LProjectPath: string;
 begin
-  for I := 0 to GetArrayLength(AGroupProjects) - 1 do 
+  for I := 0 to GetArrayLength(AGroupProjects) - 1 do
   begin
     LGroupProject := AGroupProjects[I];
     _ExpandProjectRootPath(LGroupProject.FileName, ADefaultRootPath);
@@ -236,9 +240,10 @@ begin
       LProjectPath := ExtractFilePath(LProject.FileName);
       for K := 0 to GetArrayLength(LProject.SourcePaths) - 1 do
         _ExpandProjectRootPath(LProject.SourcePaths[K], LProjectPath);
-      _ExpandProjectRootPath(LProject.BplOutputPath, LProjectPath);  
+      _ExpandProjectRootPath(LProject.BplOutputPath, LProjectPath);
       _ExpandProjectRootPath(LProject.DcpOutputPath, LProjectPath);
       _ExpandProjectRootPath(LProject.DCUOutputPath, LProjectPath);
+      _ExpandProjectRootPath(LProject.HppOutputPath, LProjectPath);
       LGroupProjectItem.Project := LProject;
       LGroupProject.Items[J] := LGroupProjectItem;
     end;
@@ -400,6 +405,10 @@ begin
       LXMLNode := LXMLDocument.SelectSingleNode('/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/RuntimeOnlyPackage');
       AProject.IsInstallable := VarIsClear(LXMLNode) or not StrToBoolDef(LXMLNode.Text, False);
 
+      // GeneratesCBuilderOutput
+      LXMLNode := LXMLDocument.SelectSingleNode('/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_CBuilderOutput');
+      AProject.GeneratesCBuilderOutput := VarIsClear(LXMLNode) or not SameText(LXMLNode.Text, 'None');
+
       // Personality
       LXMLNode := LXMLDocument.SelectSingleNode('/Project/ProjectExtensions/Borland.Personality');
       if SameText(LXMLNode.Text, 'Delphi.Personality.12') then
@@ -440,6 +449,7 @@ begin
       AProject.BplOutputPath := LXMLDocument.SelectSingleNode('/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_BplOutput').Text;
       AProject.DcpOutputPath := LXMLDocument.SelectSingleNode('/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_DcpOutput').Text;
       AProject.DCUOutputPath := LXMLDocument.SelectSingleNode('/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_DcuOutput').Text;
+      AProject.HppOutputPath := LXMLDocument.SelectSingleNode('/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_HppOutput').Text;
       AProject.Description := LXMLDocument.SelectSingleNode('/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_Description').Text;
       AProject.DllSuffix := LXMLDocument.SelectSingleNode('/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DllSuffix').Text;
     except

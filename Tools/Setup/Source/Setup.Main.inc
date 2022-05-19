@@ -22,6 +22,7 @@
 // uses
   #include "Source\RADStudio.inc"
   #include "Source\RADStudio.Build.inc"
+  #include "Source\RADStudio.CBuilder.inc"
   #include "Source\RADStudio.Project.inc"
   #include "Source\IO.Utils.inc"
   #include "Source\String.Utils.inc"
@@ -64,7 +65,7 @@ var
 // implementation
 
 /// <summary> Check if needs directory page by checking the define FilesEmbedded </summary>
-function _NeedsDirPage: Boolean; forward; 
+function _NeedsDirPage: Boolean; forward;
 
 procedure CurStepChanged(ACurStep: TSetupStep);
 var
@@ -106,7 +107,7 @@ begin
         end;
       end;
     ssPostInstall:
-      begin                   
+      begin
         LSelectedRADStudioVersions := GetSelectedRADStudioVersions;
         if GetArrayLength(LSelectedRADStudioVersions) <> 0 then
         begin
@@ -224,7 +225,7 @@ begin
     WizardForm.StatusLabel.Caption := CustomMessage('SetupMainInstallingPackages');
     try
       for I := 0 to GetArrayLength(ARADStudioInfos) - 1 do
-      begin    
+      begin
         LInfo := ARADStudioInfos[I];
         if LInfo.Status in [riNotFound, riNeedOpenFirst] then
           Continue;
@@ -239,7 +240,7 @@ begin
               Log(Format('Setup.Main.InstallPackages: Starting installation of package "%s"...', [AGroupProjects[J].Items[K].Project.FileName]));
               if (FOnTryPrepareProjectInstallation <> nil) and
                 not FOnTryPrepareProjectInstallation(AGroupProjects[J].Items[K], LInfo) then
-              begin      
+              begin
                 TryShowErrorFmt(CustomMessage('SetupMainFailedToInstallPackage'), [ExtractFileName(LProject.FileName), LVersion.Name, '1']);
                 Result := False;
                 Exit;
@@ -305,6 +306,21 @@ begin
                     Result := False;
                     Exit;
                   end;
+                  if (ppCBuilder in LInfo.Personalities) and LProject.GeneratesCBuilderOutput then
+                  begin
+                    if not TryAddCBuilderIncludePath(LVersion, LPlatform, ExpandProjectPath(LProject.HppOutputPath, pcRelease, LPlatform)) then
+                    begin
+                      TryShowErrorFmt(CustomMessage('SetupMainFailedToInstallPackage'), [ExtractFileName(LProject.FileName), LVersion.Name + ' - ' + GetProjectPlatformName(LPlatform), '8']);
+                      Result := False;
+                      Exit;
+                    end;
+                    if not TryAddCBuilderLibraryPath(LVersion, LPlatform, ExpandProjectPath(LProject.DcpOutputPath, pcRelease, LPlatform)) then
+                    begin
+                      TryShowErrorFmt(CustomMessage('SetupMainFailedToInstallPackage'), [ExtractFileName(LProject.FileName), LVersion.Name + ' - ' + GetProjectPlatformName(LPlatform), '9']);
+                      Result := False;
+                      Exit;
+                    end;
+                  end;
                 end;
               end;
             end;
@@ -359,7 +375,7 @@ begin
   Log('Setup.Main.UninstallPackages: Starting...');
   for I := 0 to GetArrayLength(ARADStudioInfos) - 1 do
   begin
-    LInfo := ARADStudioInfos[I]; 
+    LInfo := ARADStudioInfos[I];
     if LInfo.Status in [riNotFound, riNeedOpenFirst] then
       Continue;
     for J := 0 to GetArrayLength(AGroupProjects) - 1 do
@@ -377,7 +393,7 @@ begin
             begin
               Log(FmtMessage(CustomMessage('SetupMainFailedToUninstallPackage'), [ExtractFileName(LProject.FileName), LVersion.Name, '1']));
               Result := False;
-            end; 
+            end;
             if not TryRemoveRADStudioPathEnvVariable(LVersion, RemoveBackslash(ExtractFilePath(LBplFileName))) then
             begin
               Log(FmtMessage(CustomMessage('SetupMainFailedToUninstallPackage'), [ExtractFileName(LProject.FileName), LVersion.Name, '2']));
@@ -397,21 +413,37 @@ begin
           end;
           LProject := AGroupProjects[J].Items[K].Project;
             
-          // Adding search paths
+          // Removing search paths
           for LPlatform := LowProjectPlatform to HighProjectPlatform do
-          begin   
+          begin
             if (not (LPlatform in LProject.Platforms)) or (not CheckIfRADStudioSupportsPlatform(LInfo, LPlatform)) then
               Continue;
-            if (LPlatform in GetPlatformsAllowedToBuild(LInfo)) and not TryRemoveRADStudioLibrarySearchPath(LVersion, LPlatform, ExpandProjectPath(LProject.DCUOutputPath, pcRelease, LPlatform)) then
+            if (LPlatform in GetPlatformsAllowedToBuild(LInfo)) then
             begin
-              Log(FmtMessage(CustomMessage('SetupMainFailedToUninstallPackage'), [ExtractFileName(LProject.FileName), LVersion.Name + ' - ' + GetProjectPlatformName(LPlatform), '4']));
-              Result := False;
+              if not TryRemoveRADStudioLibrarySearchPath(LVersion, LPlatform, ExpandProjectPath(LProject.DCUOutputPath, pcRelease, LPlatform)) then
+              begin
+                Log(FmtMessage(CustomMessage('SetupMainFailedToUninstallPackage'), [ExtractFileName(LProject.FileName), LVersion.Name + ' - ' + GetProjectPlatformName(LPlatform), '4']));
+                Result := False;
+              end;
+              if (ppCBuilder in LInfo.Personalities) and LProject.GeneratesCBuilderOutput then
+              begin
+                if not TryRemoveCBuilderIncludePath(LVersion, LPlatform, ExpandProjectPath(LProject.HppOutputPath, pcRelease, LPlatform)) then
+                begin
+                  Log(FmtMessage(CustomMessage('SetupMainFailedToUninstallPackage'), [ExtractFileName(LProject.FileName), LVersion.Name + ' - ' + GetProjectPlatformName(LPlatform), '5']));
+                  Result := False;
+                end;
+                if not TryRemoveCBuilderLibraryPath(LVersion, LPlatform, ExpandProjectPath(LProject.DcpOutputPath, pcRelease, LPlatform)) then
+                begin
+                  Log(FmtMessage(CustomMessage('SetupMainFailedToUninstallPackage'), [ExtractFileName(LProject.FileName), LVersion.Name + ' - ' + GetProjectPlatformName(LPlatform), '6']));
+                  Result := False;
+                end;
+              end;
             end;
             for L := 0 to GetArrayLength(LProject.SourcePaths) - 1 do
             begin
               if not TryRemoveRADStudioLibrarySearchPath(LVersion, LPlatform, LProject.SourcePaths[L]) then
               begin
-                Log(FmtMessage(CustomMessage('SetupMainFailedToUninstallPackage'), [ExtractFileName(LProject.FileName), LVersion.Name + ' - ' + GetProjectPlatformName(LPlatform), '5']));
+                Log(FmtMessage(CustomMessage('SetupMainFailedToUninstallPackage'), [ExtractFileName(LProject.FileName), LVersion.Name + ' - ' + GetProjectPlatformName(LPlatform), '7']));
                 Result := False;
               end;
             end;
