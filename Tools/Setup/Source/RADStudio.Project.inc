@@ -104,6 +104,8 @@ const
 
 /// <summary> Expand just the project root, adding a ADefaultRootPath if it doesn't have and expanding the filename to remove relative paths </summary>
 procedure _ExpandProjectRootPath(var APath: string; const ADefaultRootPath: string); forward;
+/// <summary> Read a single node text and return a default value if not found </summary>
+function _ReadXMLNodeText(const AXMLNode: Variant; const AXPath, ADefaultValue: string): string; forward;
 /// <summary> Ascendent sort of items of group project by RequiresDCPCount </summary>
 function _SortGroupProjectItems(AItems: TRADStudioGroupProjectItems): TRADStudioGroupProjectItems; forward;
 /// <summary> Try to get the an attribute value by the attribute name with case insensitive </summary>
@@ -187,6 +189,17 @@ end;
 function GetRADStudioProjectDcpOutputFileName(const AProject: TRADStudioProject): string;
 begin
   Result := AddBackslash(AProject.DcpOutputPath) + ExtractFileName(ChangeFileExt(AProject.FileName, '.dcp'));
+end;
+
+function _ReadXMLNodeText(const AXMLNode: Variant; const AXPath, ADefaultValue: string): string;
+var
+  LXMLNode: Variant;
+begin
+  LXMLNode := AXMLNode.SelectSingleNode(AXPath);
+  if VarIsClear(LXMLNode) then
+    Result := ADefaultValue
+  else
+    Result := LXMLNode.Text;
 end;
 
 procedure ReplaceRootPathOfRADStudioGroupProjects(const AOldRootPath, ANewRootPath: string; var AGroupProjects: TRADStudioGroupProjects);
@@ -350,8 +363,8 @@ begin
         if _TryGetAttributeValue(LXMLNodeList.Item[I], 'Include', LAttributeValue) then
         begin
           LAttributeValue := ExtractFilePath(AGroupProject.FileName) + LAttributeValue;
-          if TryStrToProjectConfigs(LXMLNodeList.Item[I].SelectSingleNode('Configurations').Text, LItem.Configs) and
-            TryStrToProjectPlatforms(LXMLNodeList.Item[I].SelectSingleNode('Platforms').Text, LItem.Platforms) and
+          if TryStrToProjectConfigs(_ReadXMLNodeText(LXMLNodeList.Item[I], 'Configurations', ''), LItem.Configs) and
+            TryStrToProjectPlatforms(_ReadXMLNodeText(LXMLNodeList.Item[I], 'Platforms', ''), LItem.Platforms) and
             TryLoadRADStudioProject(LAttributeValue, LItem.Project) then
           begin
             SetArrayLength(AGroupProject.Items, GetArrayLength(AGroupProject.Items) + 1);
@@ -370,10 +383,9 @@ end;
 function TryLoadRADStudioProject(const AFileName: string; out AProject: TRADStudioProject): Boolean;
 var
   LPlatform: TProjectPlatform;
-  LXMLNode: Variant;
   LXMLNodeList: Variant;
   LXMLDocument: Variant;
-  LAttributeValue: string;
+  LText: string;
   I: Integer;
 begin
   Result := FileExists(AFileName);
@@ -394,30 +406,26 @@ begin
       end;
 
       // IsPackage
-      LXMLNode := LXMLDocument.SelectSingleNode('/Project/PropertyGroup/AppType');
-      AProject.IsPackage := LXMLNode.Text = 'Package';
+      AProject.IsPackage := _ReadXMLNodeText(LXMLDocument, '/Project/PropertyGroup/AppType', '') = 'Package';
 
       // ProjectVersion
-      LXMLNode := LXMLDocument.SelectSingleNode('/Project/PropertyGroup/ProjectVersion');
-      AProject.ProjectVersion := LXMLNode.Text;
+      AProject.ProjectVersion := _ReadXMLNodeText(LXMLDocument, '/Project/PropertyGroup/ProjectVersion', '');
 
       // IsInstallable
-      LXMLNode := LXMLDocument.SelectSingleNode('/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/RuntimeOnlyPackage');
-      AProject.IsInstallable := VarIsClear(LXMLNode) or not StrToBoolDef(LXMLNode.Text, False);
+      AProject.IsInstallable := not StrToBoolDef(_ReadXMLNodeText(LXMLDocument, '/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/RuntimeOnlyPackage', ''), False);
 
       // GeneratesCBuilderOutput
-      LXMLNode := LXMLDocument.SelectSingleNode('/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_CBuilderOutput');
-      AProject.GeneratesCBuilderOutput := VarIsClear(LXMLNode) or not SameText(LXMLNode.Text, 'None');
+      AProject.GeneratesCBuilderOutput := not SameText(_ReadXMLNodeText(LXMLDocument, '/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_CBuilderOutput', 'None'), 'None');
 
       // Personality
-      LXMLNode := LXMLDocument.SelectSingleNode('/Project/ProjectExtensions/Borland.Personality');
-      if SameText(LXMLNode.Text, 'Delphi.Personality.12') then
+      LText := _ReadXMLNodeText(LXMLDocument, '/Project/ProjectExtensions/Borland.Personality', '');
+      if SameText(LText, 'Delphi.Personality.12') then
         AProject.Personality := ppDelphi
-      else if SameText(LXMLNode.Text, 'CPlusPlusBuilder.Personality.12') then
+      else if SameText(LText, 'CPlusPlusBuilder.Personality.12') then
         AProject.Personality := ppCBuilder
       else
       begin
-        TryShowErrorFmt(CustomMessage('RADStudioProjectErrorParsingProjectUnknownPersonality'), [AFileName, LXMLNode.Text]);
+        TryShowErrorFmt(CustomMessage('RADStudioProjectErrorParsingProjectUnknownPersonality'), [AFileName, LText]);
         Result := False;
         Exit;
       end;
@@ -427,8 +435,8 @@ begin
       AProject.Platforms := [];
       for I := 0 to LXMLNodeList.Length-1 do
       begin
-        if StrToBoolDef(LXMLNodeList.Item[I].Text, False) and _TryGetAttributeValue(LXMLNodeList.Item[I], 'Value', LAttributeValue) and
-          TryStrToProjectPlatform(LAttributeValue, LPlatform) then
+        if StrToBoolDef(LXMLNodeList.Item[I].Text, False) and _TryGetAttributeValue(LXMLNodeList.Item[I], 'Value', LText) and
+          TryStrToProjectPlatform(LText, LPlatform) then
         begin
           Include(AProject.Platforms, LPlatform);
         end;
@@ -446,12 +454,12 @@ begin
           AProject.RequiresDCPCount := AProject.RequiresDCPCount + 1;
       end;
 
-      AProject.BplOutputPath := LXMLDocument.SelectSingleNode('/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_BplOutput').Text;
-      AProject.DcpOutputPath := LXMLDocument.SelectSingleNode('/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_DcpOutput').Text;
-      AProject.DCUOutputPath := LXMLDocument.SelectSingleNode('/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_DcuOutput').Text;
-      AProject.HppOutputPath := LXMLDocument.SelectSingleNode('/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_HppOutput').Text;
-      AProject.Description := LXMLDocument.SelectSingleNode('/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_Description').Text;
-      AProject.DllSuffix := LXMLDocument.SelectSingleNode('/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DllSuffix').Text;
+      AProject.BplOutputPath := _ReadXMLNodeText(LXMLDocument, '/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_BplOutput', '');
+      AProject.DcpOutputPath := _ReadXMLNodeText(LXMLDocument, '/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_DcpOutput', '');
+      AProject.DCUOutputPath := _ReadXMLNodeText(LXMLDocument, '/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_DcuOutput', '');
+      AProject.HppOutputPath := _ReadXMLNodeText(LXMLDocument, '/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_HppOutput', '');
+      AProject.Description := _ReadXMLNodeText(LXMLDocument, '/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DCC_Description', '');
+      AProject.DllSuffix := _ReadXMLNodeText(LXMLDocument, '/Project/PropertyGroup[@Condition="''$(Base)''!=''''"]/DllSuffix', '');
     except
       TryShowErrorFmt(CustomMessage('RADStudioProjectErrorUnexpectedParsingProject'), [AFileName, GetExceptionMessage]);
       Result := False;
@@ -487,7 +495,7 @@ begin
     end;
     Include(AConfigs, LConfig);
   end;
-  Result := True;
+  Result := AConfigs <> [];
 end;
 
 function TryStrToProjectPlatform(const APlatformName: string; out APlatform: TProjectPlatform): Boolean;
@@ -540,7 +548,7 @@ begin
     end;
     Include(APlatforms, LPlatform);
   end;
-  Result := True;
+  Result := APlatforms <> [];
 end;
 
 // end.
