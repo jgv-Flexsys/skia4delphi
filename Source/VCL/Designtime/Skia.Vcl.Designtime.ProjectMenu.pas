@@ -770,7 +770,7 @@ procedure TSkProjectManagerMenuEnableSkia.SetSkiaEnabled(
     begin
       Result := False;
       for I := 0 to ASourceList.Count - 1 do
-        if ASourceList[I].TrimLeft.StartsWith('Skia.FMX,', True) then
+        if ASourceList[I].TrimLeft.StartsWith('Skia.FMX,', True) or ASourceList[I].TrimLeft.StartsWith('Skia.FMX ', True) then
           Exit;
       LIfDefCount := 0;
       for I := 0 to ASourceList.Count - 1 do
@@ -779,7 +779,7 @@ procedure TSkProjectManagerMenuEnableSkia.SetSkiaEnabled(
           Inc(LIfDefCount);
         if ASourceList[I].ToUpper.Contains('{$END') then
           LIfDefCount := Max(LIfDefCount - 1, 0);
-        if ASourceList[I].TrimLeft.StartsWith('FMX.Forms,', True) then
+        if ASourceList[I].TrimLeft.StartsWith('FMX.Forms,', True) or ASourceList[I].TrimLeft.StartsWith('FMX.Forms ', True) then
         begin
           if LIfDefCount = 0 then
           begin
@@ -798,8 +798,11 @@ procedure TSkProjectManagerMenuEnableSkia.SetSkiaEnabled(
       I: Integer;
     begin
       Result := False;
-      if not ASourceList.Text.ToLower.Contains('skia.fmx,') then
+      if not ASourceList.Text.ToLower.Contains(string('Skia.FMX,').ToLower) and
+        not ASourceList.Text.ToLower.Contains(string('Skia.FMX ').ToLower) then
+      begin
         Exit;
+      end;
       for I := 0 to ASourceList.Count - 1 do
         if ASourceList[I].Replace(' ', '').StartsWith('GlobalUseSkia:=True', True) then
           Exit;
@@ -856,6 +859,7 @@ procedure TSkProjectManagerMenuEnableSkia.SetSkiaEnabled(
   begin
     LSourceList := TStringList.Create;
     try
+      LSourceList.TrailingLineBreak := False;
       LSourceList.Text := ASource;
       if AEnabled then
       begin
@@ -938,6 +942,7 @@ var
   LPlatform: TSkProjectPlatform;
   LConfig: TSkProjectConfig;
   LProjectOptions: IOTAProjectOptions;
+  LProjectBuilder: IOTAProjectBuilder;
 begin
   for LPlatform := Low(TSkProjectPlatform) to High(TSkProjectPlatform) do
     if SupportsPlatform(LPlatform) then
@@ -946,11 +951,15 @@ begin
   // Remove remaing files from old versions
   if not AEnabled then
     TSkProjectHelper.RemoveDeployFilesOfClass(AProject);
+
   TSkProjectHelper.IsSkiaDefined[AProject] := AEnabled;
   LProjectOptions := AProject.ProjectOptions;
   if Assigned(LProjectOptions) then
     LProjectOptions.ModifiedState := True;
   ChangeSource(AProject, AEnabled);
+  LProjectBuilder := AProject.ProjectBuilder;
+  if Assigned(LProjectBuilder) then
+    LProjectBuilder.BuildProject(TOTACompileMode.cmOTAClean, False, True);
 end;
 
 { TSkCompileNotifier }
