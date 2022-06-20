@@ -3646,7 +3646,13 @@ begin
       FCodec.SeekFrameTime(Animation.Duration / 8)
     else
       FCodec.SeekFrameTime(Animation.CurrentTime);
-    FCodec.Render(ACanvas, GetWrappedRect(ADest), AOpacity);
+    ACanvas.Save;
+    try
+      ACanvas.ClipRect(ADest);
+      FCodec.Render(ACanvas, GetWrappedRect(ADest), AOpacity);
+    finally
+      ACanvas.Restore;
+    end;
   end;
   inherited;
 end;
