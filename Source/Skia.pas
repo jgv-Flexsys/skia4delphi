@@ -9512,16 +9512,35 @@ end;
 
 procedure TSkRuntimeEffect.SetUniform(const AIndex: Integer;
   const AValue: TArray<Integer>);
+var
+  LValue: TArray<Single>;
+  I: Integer;
 begin
   if Length(AValue) = 0 then
     raise ESkException.Create(SInvalidOperation);
-  SetUniform(AIndex, AValue[0], Length(AValue) * SizeOf(Integer));
+  if not IsUniformTypeOrdinal(AIndex) then
+  begin
+    SetLength(LValue, Length(AValue));
+    for I := 0 to Length(AValue) - 1 do
+      LValue[I] := AValue[I];
+    SetUniform(AIndex, LValue);
+  end
+  else
+    SetUniform(AIndex, AValue[0], Length(AValue) * SizeOf(Integer));
 end;
 
 procedure TSkRuntimeEffect.SetUniform(const AIndex: Integer;
   const AValue: TSkRuntimeEffectInt2);
+var
+  LValue: TSkRuntimeEffectFloat2;
 begin
-  SetUniform(AIndex, AValue, SizeOf(AValue));
+  if not IsUniformTypeOrdinal(AIndex) then
+  begin
+    LValue := TSkRuntimeEffectFloat2.Create(AValue.V1, AValue.V2);
+    SetUniform(AIndex, LValue);
+  end
+  else
+    SetUniform(AIndex, AValue, SizeOf(AValue));
 end;
 
 procedure TSkRuntimeEffect.SetUniform(const AIndex, AValue: Integer);
@@ -9555,8 +9574,16 @@ end;
 
 procedure TSkRuntimeEffect.SetUniform(const AIndex: Integer;
   const AValue: TSkRuntimeEffectInt3);
+var
+  LValue: TSkRuntimeEffectFloat3;
 begin
-  SetUniform(AIndex, AValue, SizeOf(AValue));
+  if not IsUniformTypeOrdinal(AIndex) then
+  begin
+    LValue := TSkRuntimeEffectFloat3.Create(AValue.V1, AValue.V2, AValue.V3);
+    SetUniform(AIndex, LValue);
+  end
+  else
+    SetUniform(AIndex, AValue, SizeOf(AValue));
 end;
 
 procedure TSkRuntimeEffect.SetUniform(const AName: string;
@@ -9651,8 +9678,16 @@ end;
 
 procedure TSkRuntimeEffect.SetUniform(const AIndex: Integer;
   const AValue: TSkRuntimeEffectInt4);
+var
+  LValue: TSkRuntimeEffectFloat4;
 begin
-  SetUniform(AIndex, AValue, SizeOf(AValue));
+  if not IsUniformTypeOrdinal(AIndex) then
+  begin
+    LValue := TSkRuntimeEffectFloat4.Create(AValue.V1, AValue.V2, AValue.V3, AValue.V4);
+    SetUniform(AIndex, LValue);
+  end
+  else
+    SetUniform(AIndex, AValue, SizeOf(AValue));
 end;
 
 procedure TSkRuntimeEffect.SetUniform(const AIndex: Integer;
