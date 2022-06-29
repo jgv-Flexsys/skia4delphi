@@ -1237,12 +1237,10 @@ type
   { TSkTypefaceManager }
 
   TSkTypefaceManager = class sealed
-  strict private
-    class function GetProvider: ISkTypefaceFontProvider; static; deprecated 'Use TSkDefaultProviders.TypefaceFont instead';
   public
+    class function Provider: ISkTypefaceFontProvider; static; deprecated 'Use TSkDefaultProviders.TypefaceFont instead';
     class procedure RegisterTypeface(const AFileName: string); overload; static; deprecated 'Use TSkDefaultProviders.RegisterTypeface instead';
     class procedure RegisterTypeface(const AStream: TStream); overload; static; deprecated 'Use TSkDefaultProviders.RegisterTypeface instead';
-    class property Provider: ISkTypefaceFontProvider read GetProvider;
   end;
 
 const
@@ -6080,14 +6078,14 @@ end;
 
 { TSkTypefaceManager }
 
+class function TSkTypefaceManager.Provider: ISkTypefaceFontProvider;
+begin
+  Result := TSkDefaultProviders.TypefaceFont;
+end;
+
 class procedure TSkTypefaceManager.RegisterTypeface(const AFileName: string);
 begin
   TSkDefaultProviders.RegisterTypeface(AFileName);
-end;
-
-class function TSkTypefaceManager.GetProvider: ISkTypefaceFontProvider;
-begin
-  Result := TSkDefaultProviders.TypefaceFont;
 end;
 
 class procedure TSkTypefaceManager.RegisterTypeface(const AStream: TStream);
