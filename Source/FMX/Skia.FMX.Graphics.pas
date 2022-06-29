@@ -230,11 +230,13 @@ type
   strict private
     FColor: TAlphaColor;
     FIgnoreUpdates: Boolean;
+    FMaxLines: Integer;
     FOpacity: Single;
     FParagraphs: TArray<TParagraphItem>;
     FTextRect: TRectF;
     function GetParagraphsInRange(const APos, ALength: Integer): TArray<TParagraphItem>;
     function NeedHorizontalAlignment: Boolean;
+    procedure SetMaxLines(AValue: Integer);
     procedure UpdateParagraph;
   strict protected
     procedure DoDrawLayout(const ACanvas: TCanvas); overload; override;
@@ -249,6 +251,8 @@ type
     constructor Create(const ACanvas: TCanvas = nil); override;
     procedure ConvertToPath(const APath: TPathData); override;
     procedure RenderLayout(const ACanvas: ISkCanvas); overload;
+    /// <summary> Max lines allowed in text. When zero (default) it is unlimited. </summary>
+    property MaxLines: Integer read FMaxLines write SetMaxLines;
   end;
 
 const
@@ -488,13 +492,16 @@ begin
   APath.Clear;
   for I := 0 to Length(FParagraphs) - 1 do
   begin
-    LPath := TPathData.Create;
-    try
-      LPath.AddSkPath(FParagraphs[I].Paragraph.ToPath);
-      LPath.Translate(FParagraphs[I].Offset + TopLeft);
-      APath.AddPath(LPath);
-    finally
-      LPath.Free;
+    if Assigned(FParagraphs[I].Paragraph) then
+    begin
+      LPath := TPathData.Create;
+      try
+        LPath.AddSkPath(FParagraphs[I].Paragraph.ToPath);
+        LPath.Translate(FParagraphs[I].Offset + TopLeft);
+        APath.AddPath(LPath);
+      finally
+        LPath.Free;
+      end;
     end;
   end;
 end;
@@ -576,7 +583,8 @@ begin
     try
       ACanvas.ClipRect(TRectF.Create(TopLeft, MaxSize.X, MaxSize.Y));
       for I := 0 to Length(FParagraphs) - 1 do
-        FParagraphs[I].Paragraph.Paint(ACanvas, FParagraphs[I].Offset.X + TopLeft.X, FParagraphs[I].Offset.Y + TopLeft.Y);
+        if Assigned(FParagraphs[I].Paragraph) then
+          FParagraphs[I].Paragraph.Paint(ACanvas, FParagraphs[I].Offset.X + TopLeft.X, FParagraphs[I].Offset.Y + TopLeft.Y);
     finally
       ACanvas.Restore;
     end;
@@ -611,24 +619,29 @@ function TSkTextLayout.DoPositionAtPoint(const APoint: TPointF): Integer;
     LMinDistance: Single;
     I: Integer;
   begin
+    AItem := Default(TParagraphItem);
+    Result := False;
     if not Assigned(FParagraphs) then
-      Exit(False);
+      Exit;
     LMinDistance := MaxSingle;
     for I := 0 to Length(FParagraphs) - 1 do
     begin
-      LDistance := Distance(FParagraphs[I].Bounds, APoint - TopLeft);
-      if LDistance < 0 then
+      if Assigned(FParagraphs[I].Paragraph) then
       begin
-        AItem := FParagraphs[I];
-        Break;
-      end;
-      if LDistance < LMinDistance then
-      begin
-        LMinDistance := LDistance;
-        AItem := FParagraphs[I];
+        LDistance := Distance(FParagraphs[I].Bounds, APoint - TopLeft);
+        if LDistance < 0 then
+        begin
+          AItem := FParagraphs[I];
+          Exit(True);
+        end;
+        if LDistance < LMinDistance then
+        begin
+          LMinDistance := LDistance;
+          AItem := FParagraphs[I];
+          Result := True;
+        end;
       end;
     end;
-    Result := True;
   end;
 
 var
@@ -652,14 +665,17 @@ function TSkTextLayout.DoRegionForRange(const ARange: TTextRange): TRegion;
     Result := nil;
     for LParagraphItem in GetParagraphsInRange(APos, ALength) do
     begin
-      LTextBoxes := LParagraphItem.Paragraph.GetRectsForRange(APos - LParagraphItem.Range.Pos,
-        APos + ALength - LParagraphItem.Range.Pos, TSkRectHeightStyle.Max, TSkRectWidthStyle.Tight);
-      LOldLength := Length(Result);
-      SetLength(Result, LOldLength + Length(LTextBoxes));
-      for I := LOldLength to Length(LTextBoxes) - 1 do
+      if Assigned(LParagraphItem.Paragraph) then
       begin
-        Result[I] := LTextBoxes[I].Rect;
-        Result[I].Offset(LParagraphItem.Offset + TopLeft);
+        LTextBoxes := LParagraphItem.Paragraph.GetRectsForRange(APos - LParagraphItem.Range.Pos,
+          APos + ALength - LParagraphItem.Range.Pos, TSkRectHeightStyle.Max, TSkRectWidthStyle.Tight);
+        LOldLength := Length(Result);
+        SetLength(Result, LOldLength + Length(LTextBoxes));
+        for I := LOldLength to Length(LTextBoxes) - 1 do
+        begin
+          Result[I] := LTextBoxes[I].Rect;
+          Result[I].Offset(LParagraphItem.Offset + TopLeft);
+        end;
       end;
     end;
   end;
@@ -726,12 +742,15 @@ const
     LOffset := TPointF.Zero;
     for I := 0 to Length(FParagraphs) - 1 do
     begin
-      FParagraphs[I].Bounds := OffsetRect(GetParagraphItemBounds(FParagraphs[I]), LOffset);
-      if I = 0 then
-        Result := FParagraphs[I].Bounds
-      else
-        Result := Result + FParagraphs[I].Bounds;
-      LOffset.Y := FParagraphs[I].Bounds.Bottom;
+      if Assigned(FParagraphs[I].Paragraph) then
+      begin
+        FParagraphs[I].Bounds := OffsetRect(GetParagraphItemBounds(FParagraphs[I]), LOffset);
+        if Result = TRectF.Empty then
+          Result := FParagraphs[I].Bounds
+        else
+          Result := Result + FParagraphs[I].Bounds;
+        LOffset.Y := FParagraphs[I].Bounds.Bottom;
+      end;
     end;
   end;
 
@@ -772,11 +791,15 @@ begin
   LParagraphsOffset := GetParagraphOffset(FTextRect);
   FTextRect.Offset(LParagraphsOffset);
   for I := 0 to Length(FParagraphs) - 1 do
-    FParagraphs[I].Bounds := OffsetRect(FParagraphs[I].Bounds, LParagraphsOffset);
+    if Assigned(FParagraphs[I].Paragraph) then
+      FParagraphs[I].Bounds := OffsetRect(FParagraphs[I].Bounds, LParagraphsOffset);
   for I := 0 to Length(FParagraphs) - 1 do
   begin
-    FParagraphs[I].Offset := LParagraphsOffset;
-    LParagraphsOffset := LParagraphsOffset + PointF(0, FParagraphs[I].Bounds.Height);
+    if Assigned(FParagraphs[I].Paragraph) then
+    begin
+      FParagraphs[I].Offset := LParagraphsOffset;
+      LParagraphsOffset := LParagraphsOffset + PointF(0, FParagraphs[I].Bounds.Height);
+    end;
   end;
   case VerticalAlign of
     TTextAlign.Leading  : FTextRect.Bottom := Min(MaxSize.Y - Padding.Top - Padding.Bottom, FTextRect.Bottom);
@@ -837,6 +860,26 @@ procedure TSkTextLayout.RenderLayout(const ACanvas: ISkCanvas);
 begin
   RenderLayout(nil);
   DoDrawLayout(ACanvas);
+end;
+
+procedure TSkTextLayout.SetMaxLines(AValue: Integer);
+begin
+  AValue := Max(AValue, 0);
+  if FMaxLines <> AValue then
+  begin
+    FMaxLines := AValue;
+    BeginUpdate;
+    try
+      {$IF CompilerVersion >= 29}
+      SetNeedUpdate;
+      {$ELSE}
+      RightToLeft := not RightToLeft;
+      RightToLeft := not RightToLeft;
+      {$ENDIF}
+    finally
+      EndUpdate;
+    end;
+  end;
 end;
 
 procedure TSkTextLayout.UpdateParagraph;
@@ -996,7 +1039,12 @@ const
     if Trimming in [TTextTrimming.Character, TTextTrimming.Word] then
       Result.Ellipsis := '...';
     if WordWrap then
-      Result.MaxLines := High(Integer)
+    begin
+      if AMaxLines <= 0 then
+        Result.MaxLines := High(Integer)
+      else
+        Result.MaxLines := AMaxLines;
+    end
     else
       Result.MaxLines := 1;
     if NeedHorizontalAlignment then
@@ -1010,18 +1058,17 @@ const
       Result.TextAlign := SkTextAlign[HorizontalAlign];
     Result.TextStyle := CreateDefaultTextStyle;
 
-    if Result.MaxLines <> 1 then
+    if Result.MaxLines = NativeUInt(High(Integer)) then
     begin
-      if (AMaxLines = 0) and (Result.MaxLines = NativeUInt(High(Integer))) then
+      LMinFontSize := Result.TextStyle.FontSize;
+      for LAttribute in AAttributes do
+        LMinFontSize := Min(LMinFontSize, LAttribute.Attribute.Font.Size);
+      if LMinFontSize > 0.1 then
       begin
-        LMinFontSize := Result.TextStyle.FontSize;
-        for LAttribute in AAttributes do
-          LMinFontSize := Min(LMinFontSize, LAttribute.Attribute.Font.Size);
-        if LMinFontSize > 0.1 then
-          AMaxLines := Ceil(MaxSize.Y / LMinFontSize);
+        AMaxLines := Ceil(MaxSize.Y / LMinFontSize);
+        if AMaxLines > 0 then
+          Result.MaxLines := AMaxLines;
       end;
-      if AMaxLines > 0 then
-        Result.MaxLines := AMaxLines;
     end;
   end;
 
@@ -1068,7 +1115,7 @@ const
     Result := LBuilder.Build;
   end;
 
-  procedure DoUpdateParagraph(var AParagraphItem: TParagraphItem; const ASubText: string);
+  procedure DoUpdateParagraph(var AParagraphItem: TParagraphItem; const ASubText: string; const AMaxLines: Integer);
   {$IF CompilerVersion < 29}
   const
     MaxLayoutSize: TPointF = (X: $FFFF; Y: $FFFF);
@@ -1076,7 +1123,7 @@ const
   var
     LLineMetric: TSkMetrics;
   begin
-    AParagraphItem.Paragraph := CreateParagraph(0, ASubText, AParagraphItem.Range.Pos);
+    AParagraphItem.Paragraph := CreateParagraph(AMaxLines, ASubText, AParagraphItem.Range.Pos);
     if NeedHorizontalAlignment then
       AParagraphItem.Paragraph.Layout(MaxLayoutSize.X)
     else
@@ -1099,6 +1146,8 @@ var
   LText: string;
   LLines: TArray<string>;
   LPos: Integer;
+  LMaxLines: Integer;
+  LLimitedLines: Boolean;
   I: Integer;
 begin
   LText := Text;
@@ -1134,11 +1183,28 @@ begin
   else
     LLines := LText.Replace(#13#10, ZeroWidthChar + #10).Replace(#13, #10).Replace(#10, ZeroWidthChar + #10).Split([#10]);
   LPos := 0;
+  LMaxLines := FMaxLines;
+  LLimitedLines := FMaxLines <> 0;
   SetLength(FParagraphs, Length(LLines));
   for I := 0 to Length(LLines) - 1 do
   begin
     FParagraphs[I].Range := TTextRange.Create(LPos, LLines[I].Length);
-    DoUpdateParagraph(FParagraphs[I], LLines[I]);
+    if LMaxLines = -1 then
+    begin
+      FParagraphs[I].Bounds := TRectF.Empty;
+      FParagraphs[I].Paragraph := nil;
+      FParagraphs[I].Offset := TPointF.Zero;
+    end
+    else
+    begin
+      DoUpdateParagraph(FParagraphs[I], LLines[I], LMaxLines);
+      if LLimitedLines then
+      begin
+        Dec(LMaxLines, Length(FParagraphs[I].Paragraph.LineMetrics));
+        if LMaxLines <= 0 then
+          LMaxLines :=  -1;
+      end;
+    end;
     Inc(LPos, LLines[I].Length);
   end;
 end;
