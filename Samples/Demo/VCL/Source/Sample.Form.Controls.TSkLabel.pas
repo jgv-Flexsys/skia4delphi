@@ -106,8 +106,8 @@ begin
       LLabel: TSkLabel absolute Result;
     begin
       // It is preferable to register only once at startup.
-      TSkTypefaceManager.RegisterTypeface(AssetsPath + 'bonheur-royale-regular.ttf');
-      TSkTypefaceManager.RegisterTypeface(AssetsPath + 'nunito-extrabold.ttf');
+      TSkDefaultProviders.RegisterTypeface(AssetsPath + 'bonheur-royale-regular.ttf');
+      TSkDefaultProviders.RegisterTypeface(AssetsPath + 'nunito-extrabold.ttf');
 
       LLabel := TSkLabel.Create(nil);
       LLabel.Align := alTop;

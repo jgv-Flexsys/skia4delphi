@@ -163,7 +163,7 @@ end;
 procedure TSkLabelTests.Setup;
 begin
   inherited;
-  RegisterFontFiles(TSkTypefaceManager.Provider);
+  RegisterFontFiles(TSkDefaultProviders.TypefaceFont);
 end;
 
 procedure TSkLabelTests.Test(const AText: string; const ABitmapSize: TSize;

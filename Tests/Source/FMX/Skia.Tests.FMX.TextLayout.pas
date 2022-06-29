@@ -183,7 +183,7 @@ end;
 procedure TSkTextLayoutTests.Setup;
 begin
   inherited;
-  RegisterFontFiles(TSkTypefaceManager.Provider);
+  RegisterFontFiles(TSkDefaultProviders.TypefaceFont);
 end;
 
 procedure TSkTextLayoutTests.Test(const AText: string; const ABitmapSize: TSize;
