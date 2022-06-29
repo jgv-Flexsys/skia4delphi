@@ -1107,16 +1107,29 @@ type
     property Words: TWordsCollection read FWords write SetWords;
   end;
 
-  { TSkTypefaceManager }
+  { TSkDefaultProviders }
 
-  TSkTypefaceManager = class sealed
-  strict private
-    class var FProvider: ISkTypefaceFontProvider;
+  TSkDefaultProviders = class sealed
+  strict private class var
+    FResource: ISkResourceProvider;
+    FTypefaceFont: ISkTypefaceFontProvider;
     class constructor Create;
   public
     class procedure RegisterTypeface(const AFileName: string); overload; static;
     class procedure RegisterTypeface(const AStream: TStream); overload; static;
-    class property Provider: ISkTypefaceFontProvider read FProvider;
+    class property Resource: ISkResourceProvider read FResource write FResource;
+    class property TypefaceFont: ISkTypefaceFontProvider read FTypefaceFont;
+  end;
+
+  { TSkTypefaceManager }
+
+  TSkTypefaceManager = class sealed
+  strict private
+    class function GetProvider: ISkTypefaceFontProvider; static; deprecated 'Use TSkDefaultProviders.TypefaceFont instead';
+  public
+    class procedure RegisterTypeface(const AFileName: string); overload; static; deprecated 'Use TSkDefaultProviders.RegisterTypeface instead';
+    class procedure RegisterTypeface(const AStream: TStream); overload; static; deprecated 'Use TSkDefaultProviders.RegisterTypeface instead';
+    class property Provider: ISkTypefaceFontProvider read GetProvider;
   end;
 
 const
@@ -1702,7 +1715,7 @@ end;
 
 function TSkSvgBrush.MakeDOM: ISkSVGDOM;
 begin
-  Result := TSkSVGDOM.Make(FSource);
+  Result := TSkSVGDOM.Make(FSource, TSkDefaultProviders.Resource);
 end;
 
 procedure TSkSvgBrush.RecreateDOM;
@@ -3592,7 +3605,7 @@ class function TSkLottieAnimationCodec.TryMakeFromStream(const AStream: TStream;
   begin
     LDecompressionStream := TDecompressionStream.Create(AStream, 31);
     try
-      Result := TSkottieAnimation.MakeFromStream(LDecompressionStream);
+      Result := TSkottieAnimation.MakeFromStream(LDecompressionStream, TSkDefaultProviders.Resource);
     finally
       LDecompressionStream.Free;
     end;
@@ -3604,7 +3617,7 @@ begin
   if IsTgs then
     LSkottie := MakeFromTgsStream(AStream)
   else
-    LSkottie := TSkottieAnimation.MakeFromStream(AStream);
+    LSkottie := TSkottieAnimation.MakeFromStream(AStream, TSkDefaultProviders.Resource);
 
   Result := Assigned(LSkottie);
   if Result then
@@ -5570,21 +5583,38 @@ begin
     TextSettingsChanged(nil);
 end;
 
-{ TSkTypefaceManager }
+{ TSkDefaultProviders }
 
-class constructor TSkTypefaceManager.Create;
+class constructor TSkDefaultProviders.Create;
 begin
-  FProvider := TSkTypefaceFontProvider.Create;
+  FTypefaceFont := TSkTypefaceFontProvider.Create;
 end;
+
+class procedure TSkDefaultProviders.RegisterTypeface(const AFileName: string);
+begin
+  FTypefaceFont.RegisterTypeface(TSkTypeFace.MakeFromFile(AFileName));
+end;
+
+class procedure TSkDefaultProviders.RegisterTypeface(const AStream: TStream);
+begin
+  FTypefaceFont.RegisterTypeface(TSkTypeFace.MakeFromStream(AStream));
+end;
+
+{ TSkTypefaceManager }
 
 class procedure TSkTypefaceManager.RegisterTypeface(const AFileName: string);
 begin
-  FProvider.RegisterTypeface(TSkTypeFace.MakeFromFile(AFileName));
+  TSkDefaultProviders.RegisterTypeface(AFileName);
+end;
+
+class function TSkTypefaceManager.GetProvider: ISkTypefaceFontProvider;
+begin
+  Result := TSkDefaultProviders.TypefaceFont;
 end;
 
 class procedure TSkTypefaceManager.RegisterTypeface(const AStream: TStream);
 begin
-  FProvider.RegisterTypeface(TSkTypeFace.MakeFromStream(AStream));
+  TSkDefaultProviders.RegisterTypeface(AStream);
 end;
 
 { TSkGraphic }

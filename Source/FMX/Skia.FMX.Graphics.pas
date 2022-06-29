@@ -1044,7 +1044,7 @@ const
     FOpacity := Opacity;
     LAttributes := GetNormalizedAttributes(ASubText, ASubTextPosition);
     try
-      LBuilder := TSkParagraphBuilder.Create(CreateParagraphStyle(LAttributes, AMaxLines), TSkTypefaceManager.Provider);
+      LBuilder := TSkParagraphBuilder.Create(CreateParagraphStyle(LAttributes, AMaxLines), TSkDefaultProviders.TypefaceFont);
       LLastAttributeEndIndex := 0;
       for LAttribute in LAttributes do
       begin
