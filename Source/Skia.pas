@@ -11944,8 +11944,14 @@ begin
 end;
 
 function TSkFileResourceProvider.Load(const APath, AName: string): TBytes;
+var
+  LFileName: string;
 begin
-  Result := TFile.ReadAllBytes(TPath.Combine(TPath.Combine(FBaseDir, APath), AName));
+  LFileName := TPath.Combine(TPath.Combine(FBaseDir, APath), AName);
+  if TFile.Exists(LFileName) then
+    Result := TFile.ReadAllBytes(LFileName)
+  else
+    Result := nil;
 end;
 
 { TSkShaper }
