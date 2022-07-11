@@ -1652,6 +1652,7 @@ type
     procedure AddCircle(const ACenterX, ACenterY, ARadius: Single; ADirection: TSkPathDirection = TSkPathDirection.CW); overload;
     procedure AddOval(const ARect: TRectF; ADirection: TSkPathDirection = TSkPathDirection.CW); overload;
     procedure AddOval(const ARect: TRectF; ADirection: TSkPathDirection; AStartIndex: Cardinal); overload;
+    procedure AddPath(const APath: ISkPath);
     procedure AddPolygon(const APolygon: TPolygon; const IsClosed: Boolean);
     procedure AddRect(const ARect: TRectF; ADirection: TSkPathDirection = TSkPathDirection.CW); overload;
     procedure AddRect(const ARect: TRectF; ADirection: TSkPathDirection; AStartIndex: Cardinal); overload;
@@ -1669,7 +1670,7 @@ type
     function GetBounds: TRectF;
     function GetFillType: TSkPathFillType;
     procedure IncReserve(const AExtraPointCount: Integer); overload;
-    procedure IncReserve(const AExtraPointCount, AExtraVerbCount: Integer);  overload;
+    procedure IncReserve(const AExtraPointCount, AExtraVerbCount: Integer); overload;
     procedure LineTo(const APoint: TPointF); overload;
     procedure LineTo(const AX, AY: Single); overload;
     procedure MoveTo(const APoint: TPointF); overload;
