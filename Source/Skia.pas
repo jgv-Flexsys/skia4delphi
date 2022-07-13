@@ -9170,7 +9170,7 @@ end;
 function TSkRuntimeEffect.GetChildName(const AIndex: Integer): string;
 begin
   if (AIndex < 0) or (AIndex >= GetChildCount) then
-    raise ESkArgumentException.CreateFmt(SParamOutOfRange, ['AIndex', 0, GetChildCount]);
+    raise ESkArgumentException.CreateFmt(SParamOutOfRange, ['AIndex', AIndex, 0, GetChildCount]);
   Result := string(TSkiaAPI.sk4d_runtimeeffect_get_child_name(GetHandle, AIndex));
 end;
 
@@ -9190,7 +9190,7 @@ function TSkRuntimeEffect.GetChildType(
   const AIndex: Integer): TSkRuntimeEffectChildType;
 begin
   if (AIndex < 0) or (AIndex >= GetChildCount) then
-    raise ESkArgumentException.CreateFmt(SParamOutOfRange, ['AIndex', 0, GetChildCount]);
+    raise ESkArgumentException.CreateFmt(SParamOutOfRange, ['AIndex', AIndex, 0, GetChildCount]);
   Result := TSkRuntimeEffectChildType(TSkiaAPI.sk4d_runtimeeffect_get_child_type(GetHandle, AIndex));
 end;
 
@@ -9230,14 +9230,14 @@ end;
 function TSkRuntimeEffect.GetUniformName(const AIndex: Integer): string;
 begin
   if (AIndex < 0) or (AIndex >= GetUniformCount) then
-    raise ESkArgumentException.CreateFmt(SParamOutOfRange, ['AIndex', 0, GetUniformCount]);
+    raise ESkArgumentException.CreateFmt(SParamOutOfRange, ['AIndex', AIndex, 0, GetUniformCount]);
   Result := string(TSkiaAPI.sk4d_runtimeeffect_get_uniform_name(GetHandle, AIndex));
 end;
 
 function TSkRuntimeEffect.GetUniformOffset(const AIndex: Integer): NativeUInt;
 begin
   if (AIndex < 0) or (AIndex >= GetUniformCount) then
-    raise ESkArgumentException.CreateFmt(SParamOutOfRange, ['AIndex', 0, GetUniformCount]);
+    raise ESkArgumentException.CreateFmt(SParamOutOfRange, ['AIndex', AIndex, 0, GetUniformCount]);
   Result := TSkiaAPI.sk4d_runtimeeffect_get_uniform_offset(GetHandle, AIndex);
 end;
 
@@ -9250,7 +9250,7 @@ function TSkRuntimeEffect.GetUniformType(
   const AIndex: Integer): TSkRuntimeEffectUniformType;
 begin
   if (AIndex < 0) or (AIndex >= GetUniformCount) then
-    raise ESkArgumentException.CreateFmt(SParamOutOfRange, ['AIndex', 0, GetUniformCount]);
+    raise ESkArgumentException.CreateFmt(SParamOutOfRange, ['AIndex', AIndex, 0, GetUniformCount]);
   Result := TSkRuntimeEffectUniformType(TSkiaAPI.sk4d_runtimeeffect_get_uniform_type(GetHandle, AIndex));
 end;
 
@@ -9268,7 +9268,7 @@ end;
 function TSkRuntimeEffect.GetUniformTypeCount(const AIndex: Integer): Integer;
 begin
   if (AIndex < 0) or (AIndex >= GetUniformCount) then
-    raise ESkArgumentException.CreateFmt(SParamOutOfRange, ['AIndex', 0, GetUniformCount]);
+    raise ESkArgumentException.CreateFmt(SParamOutOfRange, ['AIndex', AIndex, 0, GetUniformCount]);
   Result := TSkiaAPI.sk4d_runtimeeffect_get_uniform_type_count(GetHandle, AIndex);
 end;
 
