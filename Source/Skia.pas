@@ -6498,7 +6498,7 @@ begin
   LBytesStream := TBytesStream.Create(nil);
   try
     EncodeToStream(LBytesStream, AEncodedImageFormat, AQuality);
-    Result := LBytesStream.Bytes;
+    Result := Copy(LBytesStream.Bytes, 0, LBytesStream.Size);
   finally
     LBytesStream.Free;
   end;
@@ -6888,7 +6888,7 @@ begin
   LBytesStream := TBytesStream.Create(nil);
   try
     EncodeToStream(LBytesStream, ASrc, AEncodedImageFormat, AQuality);
-    Result := LBytesStream.Bytes;
+    Result := Copy(LBytesStream.Bytes, 0, LBytesStream.Size);
   finally
     LBytesStream.Free;
   end;
@@ -7846,7 +7846,7 @@ begin
   LStream := TBytesStream.Create(nil);
   try
     SerializeToStream(LStream);
-    Result := LStream.Bytes;
+    Result := Copy(LStream.Bytes, 0, LStream.Size);
   finally
     LStream.Free;
   end;
@@ -8384,7 +8384,7 @@ begin
   LStream := TBytesStream.Create(nil);
   try
     SerializeToStream(LStream);
-    Result := LStream.Bytes;
+    Result := Copy(LStream.Bytes, 0, LStream.Size);
   finally
     LStream.Free;
   end;
