@@ -9208,7 +9208,7 @@ end;
 function TSkRuntimeEffect.GetUniform(const AIndex: Integer): Pointer;
 begin
   if (AIndex < 0) or (AIndex >= GetUniformCount) then
-    raise ESkArgumentException.CreateFmt(SParamOutOfRange, ['AIndex', 0, GetUniformCount]);
+    raise ESkArgumentException.CreateFmt(SParamOutOfRange, ['AIndex', AIndex, 0, GetUniformCount]);
   Result := Pointer(NativeUInt(FUniformData) + GetUniformOffset(AIndex));
 end;
 
